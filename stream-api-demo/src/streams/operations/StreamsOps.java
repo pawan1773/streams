@@ -31,7 +31,7 @@ public class StreamsOps {
 		Map<String, Long> map = persons.stream()
 				.collect(Collectors.groupingBy(Person::getGender, Collectors.counting()));
 		map.forEach((k, v) -> System.out.println("key => " + k + ", count => " + v));
-		
+
 		System.out.println("=================");
 
 		Map<String, Optional<Person>> maxBy = persons.stream().collect(Collectors.groupingBy(Person::getGender,
