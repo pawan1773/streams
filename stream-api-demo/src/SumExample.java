@@ -3,13 +3,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SumExample {
+	
+	public static boolean isNotNull(Object object) {
+		return null != object;
+	}
 
 	public static void main(String[] args) {
 		
 		List<ContractMapping> contractMappings = new ArrayList<>();
 		
 		contractMappings
-				.add(new  ContractMapping(new CampaignMaster("Open"), BigDecimal.valueOf(1001), BigDecimal.valueOf(1002), BigDecimal.valueOf(1003)));
+				.add(new  ContractMapping(new CampaignMaster("Open"), BigDecimal.valueOf(1001), BigDecimal.valueOf(1002), null));
 		contractMappings
 				.add(new ContractMapping(new CampaignMaster("Open"), BigDecimal.valueOf(2001), BigDecimal.valueOf(2002), BigDecimal.valueOf(2003)));
 		contractMappings
@@ -17,12 +21,19 @@ public class SumExample {
 		contractMappings
 				.add(new ContractMapping(new CampaignMaster("Open"), BigDecimal.valueOf(4001), BigDecimal.valueOf(4002), BigDecimal.valueOf(4003)));
 
-		final BigDecimal totalMaturedAmount = contractMappings.stream().map(ContractMapping::getMaturedAmount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		final BigDecimal totalPaidAmount = contractMappings.stream().map(ContractMapping::getPaidAmount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		final BigDecimal totalMaturedAmount = contractMappings
+												.stream()
+												.map(ContractMapping::getMaturedAmount)
+												.filter(SumExample::isNotNull)
+												.reduce(BigDecimal.ZERO, BigDecimal::add);
+		final BigDecimal totalPaidAmount = contractMappings
+											.stream()
+											.map(ContractMapping::getPaidAmount)
+											.filter(amount -> amount != null)
+											.reduce(BigDecimal.ZERO, BigDecimal::add);
 		
-		final BigDecimal missedAmount = contractMappings.stream().filter(contractMapping -> contractMapping.getCampaignMaster().getStatus().equalsIgnoreCase("Closed")).map(ContractMapping::getMissedAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		final BigDecimal missedAmount = contractMappings.stream()
+				.filter(contractMapping -> contractMapping.getCampaignMaster().getStatus().equalsIgnoreCase("Closed")).map(ContractMapping::getMissedAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		System.out.println("totalMaturedAmount => " + totalMaturedAmount);
 		System.out.println("totalPaidAmount => " + totalPaidAmount);
